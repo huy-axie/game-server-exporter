@@ -26,6 +26,15 @@ var (
 	})
 )
 
+var (
+	hostName = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name:        "game_server_hostname",
+			Help:        "Game server hostname",
+			ConstLabels: map[string]string{"nodename": getHostName()},
+		})
+)
+
 func recordMetrics() {
 	go func() {
 		for {
@@ -69,7 +78,6 @@ func getBattles() {
 		case <-time.After(time.Duration(1) * time.Second * 30):
 			// Send an echo packet every second
 			err := conn.WriteMessage(websocket.TextMessage, []byte(os.Getenv("GAME_SERVER_TOKEN")))
-			println(os.Getenv("GAME_SERVER_TOKEN"))
 			if err != nil {
 				log.Println("Error during writing to websocket:", err)
 				return
@@ -97,9 +105,18 @@ func getBattles() {
 	}
 }
 
-func main() {
+func getHostName() string {
+	name, err := os.Hostname()
+	if err != nil {
+		panic("Can't get hostname")
+	}
+	return name
+}
 
+func main() {
 	// register metrics
+	prometheus.MustRegister(hostName)
+
 	prometheus.MustRegister(battlesNumber)
 
 	// start to count battle
