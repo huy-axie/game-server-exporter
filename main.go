@@ -21,18 +21,10 @@ var done chan interface{}
 var interrupt chan os.Signal
 var (
 	battlesNumber = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "game_server_battle_total",
-		Help: "The total number of match happening",
+		Name:        "game_server_battle_total",
+		Help:        "The total number of match happening",
+		ConstLabels: map[string]string{"nodename": getHostName()},
 	})
-)
-
-var (
-	hostName = prometheus.NewGauge(
-		prometheus.GaugeOpts{
-			Name:        "game_server_hostname",
-			Help:        "Game server hostname",
-			ConstLabels: map[string]string{"nodename": getHostName()},
-		})
 )
 
 func recordMetrics() {
@@ -115,8 +107,6 @@ func getHostName() string {
 
 func main() {
 	// register metrics
-	prometheus.MustRegister(hostName)
-
 	prometheus.MustRegister(battlesNumber)
 
 	// start to count battle
