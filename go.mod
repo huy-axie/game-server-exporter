@@ -2,10 +2,7 @@ module game-server-exporter
 
 go 1.17
 
-require (
-	github.com/gorilla/websocket v1.4.2
-	github.com/prometheus/client_golang v1.11.0
-)
+require github.com/prometheus/client_golang v1.11.0
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
