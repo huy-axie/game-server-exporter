@@ -42,7 +42,7 @@ func recordMetrics() {
 
 func getBattles() {
 	httpUrl := "http://" + os.Getenv("GAME_SERVER_IP") + ":" + os.Getenv("GAME_SERVER_PORT") + "/" + os.Getenv("BATTLE_PATH")
-	// fmt.Println("Open connection to " + httpUrl)
+	fmt.Println("Open connection to " + httpUrl)
 
 	req, err := http.NewRequest("GET", httpUrl, nil)
 	if err != nil {
@@ -64,6 +64,7 @@ func getBattles() {
 	if err != nil {
 		panic(err)
 	}
+
 	dat := Data{}
 	if err := json.Unmarshal(body, &dat); err != nil {
 		panic(err)
