@@ -27,6 +27,7 @@ var (
 	})
 )
 
+// set metrics
 func recordMetrics() {
 	go func() {
 		for {
@@ -36,6 +37,7 @@ func recordMetrics() {
 	}()
 }
 
+// received number battles
 func receiveHandler(connection *websocket.Conn) {
 	defer close(done)
 	for {
@@ -97,6 +99,7 @@ func getBattles() {
 	}
 }
 
+// Get node name
 func getHostName() string {
 	name, err := os.Hostname()
 	if err != nil {
