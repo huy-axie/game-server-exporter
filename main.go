@@ -14,15 +14,71 @@ import (
 )
 
 type Data struct {
-	Total int `json:"total"`
+	TotalBattle        int `json:"total_battle"`
+	TotalPlayer        int `json:"total_player"`
+	TotalConnection    int `json:"total_connection"`
+	ClientMap          int `json:"client_map"`
+	MmrDataQueue       int `json:"mmr_data_queue"`
+	DivisionDataQueue  int `json:"division_data_queue"`
+	MmrReadyQueue      int `json:"mmr_ready_queue"`
+	DivisionReadyQueue int `json:"division_ready_queue"`
+	PveQueue           int `json:"pve_queue"`
 }
 
-var battles int
+var battlesValue, clientmapValue, mmrdataqueueValue, divisiondataqueueValue, mmrreadyqueueValue, divisionreadyqueueValue, pvequeueValue, playerValue, connectionValue int
 
 var (
 	battlesNumber = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:        "origin_game_server_battle_total",
 		Help:        "The total number of match happening",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+
+	playerNumber = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_total_player",
+		Help:        "The total PvE in queue.",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+
+	connectionNumber = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_total_connection",
+		Help:        "The total PvE in queue.",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+
+	clientMap = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_client_map",
+		Help:        "The total client map",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+
+	mmrDataQueue = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_mmr_data_queue",
+		Help:        "The total MMR data in queue.",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+
+	divisionDataQueue = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_division_data_queue",
+		Help:        "The total division data in queue.",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+
+	mmrReadyQueue = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_mmr_ready_queue",
+		Help:        "The total MMR ready in queue.",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+
+	divisionReadyQueue = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_division_ready_queue",
+		Help:        "The total division ready in queue.",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+
+	pveQueue = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_pve_queue",
+		Help:        "The total PvE in queue.",
 		ConstLabels: map[string]string{"nodename": getHostName()},
 	})
 )
@@ -34,7 +90,15 @@ func recordMetrics() {
 			// get battles
 			getBattles()
 			// set metrics
-			battlesNumber.Set(float64(battles))
+			battlesNumber.Set(float64(battlesValue))
+			clientMap.Set(float64(clientmapValue))
+			mmrDataQueue.Set(float64(mmrdataqueueValue))
+			divisionDataQueue.Set(float64(divisiondataqueueValue))
+			mmrReadyQueue.Set(float64(mmrreadyqueueValue))
+			divisionReadyQueue.Set(float64(divisionreadyqueueValue))
+			pveQueue.Set(float64(pvequeueValue))
+			playerNumber.Set(float64(playerValue))
+			connectionNumber.Set(float64(connectionValue))
 			time.Sleep(15 * time.Second)
 		}
 	}()
@@ -42,6 +106,7 @@ func recordMetrics() {
 
 func getBattles() {
 	httpUrl := "http://" + os.Getenv("GAME_SERVER_IP") + ":" + os.Getenv("GAME_SERVER_PORT") + "/" + os.Getenv("BATTLE_PATH")
+	// httpUrl := "http://34.132.246.179:1998/rpc/tracking/total-battles"
 	fmt.Println("Open connection to " + httpUrl)
 
 	req, err := http.NewRequest("GET", httpUrl, nil)
@@ -64,13 +129,22 @@ func getBattles() {
 	if err != nil {
 		panic(err)
 	}
-
+	fmt.Println(string(body))
 	dat := Data{}
 	if err := json.Unmarshal(body, &dat); err != nil {
 		panic(err)
 	}
 
-	battles = dat.Total
+	// // set value
+	battlesValue = dat.TotalBattle
+	clientmapValue = dat.ClientMap
+	mmrdataqueueValue = dat.MmrDataQueue
+	divisiondataqueueValue = dat.DivisionDataQueue
+	mmrreadyqueueValue = dat.MmrReadyQueue
+	divisionreadyqueueValue = dat.DivisionReadyQueue
+	pvequeueValue = dat.PveQueue
+	playerValue = dat.TotalPlayer
+	connectionValue = dat.TotalConnection
 }
 
 // Get node name
@@ -85,7 +159,14 @@ func getHostName() string {
 func main() {
 	// register metrics
 	prometheus.MustRegister(battlesNumber)
-
+	prometheus.MustRegister(clientMap)
+	prometheus.MustRegister(mmrDataQueue)
+	prometheus.MustRegister(divisionDataQueue)
+	prometheus.MustRegister(mmrReadyQueue)
+	prometheus.MustRegister(divisionReadyQueue)
+	prometheus.MustRegister(pveQueue)
+	prometheus.MustRegister(connectionNumber)
+	prometheus.MustRegister(playerNumber)
 	// record metrics
 	recordMetrics()
 
