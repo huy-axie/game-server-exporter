@@ -42,13 +42,13 @@ var (
 
 	playerNumber = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:        "origin_game_server_total_player",
-		Help:        "The total PvE in queue.",
+		Help:        "The total player.",
 		ConstLabels: map[string]string{"nodename": getHostName()},
 	})
 
 	connectionNumber = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:        "origin_game_server_total_connection",
-		Help:        "The total PvE in queue.",
+		Help:        "The total connections.",
 		ConstLabels: map[string]string{"nodename": getHostName()},
 	})
 
