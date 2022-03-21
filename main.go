@@ -9,10 +9,16 @@ import (
 	"os"
 	"time"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+type InternalClaims struct {
+	ClientID string `json:"client_id,omitempty"`
+	Role     string `json:"role,omitempty"`
+	jwt.StandardClaims
+}
 type Data struct {
 	TotalBattle        int `json:"total_battle"`
 	TotalPlayer        int `json:"total_player"`
@@ -83,6 +89,26 @@ var (
 	})
 )
 
+// Gen token
+func GenerateToken() (string, error) {
+	claims := &InternalClaims{
+		ClientID: "internal",
+		Role:     "internal",
+		StandardClaims: jwt.StandardClaims{
+			Issuer:    "AxieInfinity",
+			IssuedAt:  time.Now().UTC().Unix(),
+			ExpiresAt: time.Now().Add(time.Minute * 1).Unix(),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedToken, err := token.SignedString([]byte(os.Getenv("GAME_SERVER_JWT")))
+	if err != nil {
+		return "", err
+	}
+	return signedToken, nil
+}
+
 // set metrics
 func recordMetrics() {
 	go func() {
@@ -105,8 +131,14 @@ func recordMetrics() {
 }
 
 func getBattles() {
+	// generate token
+	token, err := GenerateToken()
+	if err != nil {
+		panic(err)
+	}
+
+	// game server metrics path
 	httpUrl := "http://" + os.Getenv("GAME_SERVER_IP") + ":" + os.Getenv("GAME_SERVER_PORT") + "/" + os.Getenv("BATTLE_PATH")
-	// httpUrl := "http://34.132.246.179:1998/rpc/tracking/total-battles"
 	fmt.Println("Open connection to " + httpUrl)
 
 	req, err := http.NewRequest("GET", httpUrl, nil)
@@ -116,7 +148,7 @@ func getBattles() {
 
 	req.Header = http.Header{
 		"Content-Type":  []string{"application/json"},
-		"Authorization": []string{os.Getenv("GAME_SERVER_TOKEN")},
+		"Authorization": []string{token},
 	}
 	res, err := http.DefaultClient.Do(req)
 
