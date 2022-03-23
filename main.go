@@ -29,14 +29,28 @@ type Data struct {
 	MmrReadyQueue      int `json:"mmr_ready_queue"`
 	DivisionReadyQueue int `json:"division_ready_queue"`
 	PveQueue           int `json:"pve_queue"`
+	TotalPve           int `json:"total_pve"`
+	TotalPvp           int `json:"total_pvp"`
 }
 
-var battlesValue, clientmapValue, mmrdataqueueValue, divisiondataqueueValue, mmrreadyqueueValue, divisionreadyqueueValue, pvequeueValue, playerValue, connectionValue int
+var battlesValue, clientmapValue, mmrdataqueueValue, divisiondataqueueValue, mmrreadyqueueValue, divisionreadyqueueValue, pvequeueValue, playerValue, connectionValue, pveValue, pvpValue int
 
 var (
 	battlesNumber = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:        "origin_game_server_battle_total",
 		Help:        "The total number of match happening",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+
+	pveNumber = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_pve_total",
+		Help:        "The total number of PvE happening",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+
+	pvpNumber = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_pvp_total",
+		Help:        "The total number of PvP happening",
 		ConstLabels: map[string]string{"nodename": getHostName()},
 	})
 
@@ -125,6 +139,9 @@ func recordMetrics() {
 			pveQueue.Set(float64(pvequeueValue))
 			playerNumber.Set(float64(playerValue))
 			connectionNumber.Set(float64(connectionValue))
+			pvpNumber.Set((float64(pvpValue)))
+			pveNumber.Set((float64(pveValue)))
+
 			time.Sleep(15 * time.Second)
 		}
 	}()
@@ -177,6 +194,8 @@ func getBattles() {
 	pvequeueValue = dat.PveQueue
 	playerValue = dat.TotalPlayer
 	connectionValue = dat.TotalConnection
+	pveValue = dat.TotalPve
+	pvpValue = dat.TotalPvp
 }
 
 // Get node name
@@ -199,6 +218,9 @@ func main() {
 	prometheus.MustRegister(pveQueue)
 	prometheus.MustRegister(connectionNumber)
 	prometheus.MustRegister(playerNumber)
+	prometheus.MustRegister(pveNumber)
+	prometheus.MustRegister(pvpNumber)
+
 	// record metrics
 	recordMetrics()
 
