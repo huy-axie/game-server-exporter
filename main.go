@@ -32,18 +32,18 @@ type Data struct {
 	TotalPve           int `json:"total_pve"`
 	TotalPvp           int `json:"total_pvp"`
 
-	PveHashmapCap         int `json:"pve_hashmap_cap"`
+	PveQueueCap           int `json:"pve_queue_cap"`
 	MmrDataQueueCap       int `json:"mmr_data_queue_cap"`
 	DivisionDataQueueCap  int `json:"division_data_queue_cap"`
 	MmrReadyQueueCap      int `json:"mmr_ready_queue_cap"`
 	DivisionReadyQueueCap int `json:"division_ready_queue_cap"`
 }
 
-var battlesValue, clientmapValue, mmrdataqueueValue, divisiondataqueueValue, mmrreadyqueueValue, divisionreadyqueueValue, pvequeueValue, playerValue, connectionValue, pveValue, pvpValue, PveHashmapCapValue, MmrDataQueueCapValue, DivisionDataQueueCapValue, MmrReadyQueueCapValue, DivisionReadyQueueCapValue int
+var battlesValue, clientmapValue, mmrdataqueueValue, divisiondataqueueValue, mmrreadyqueueValue, divisionreadyqueueValue, pvequeueValue, playerValue, connectionValue, pveValue, pvpValue, PveQueueCapValue, MmrDataQueueCapValue, DivisionDataQueueCapValue, MmrReadyQueueCapValue, DivisionReadyQueueCapValue int
 
 var (
-	PveHashmapCapNumber = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name:        "origin_game_server_pve_hashmap_cap",
+	PveQueueCapNumber = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_pve_queue_cap",
 		Help:        "The total number of pve hashmap",
 		ConstLabels: map[string]string{"nodename": getHostName()},
 	})
@@ -175,7 +175,7 @@ func recordMetrics() {
 			connectionNumber.Set(float64(connectionValue))
 			pvpNumber.Set((float64(pvpValue)))
 			pveNumber.Set((float64(pveValue)))
-			PveHashmapCapNumber.Set((float64(PveHashmapCapValue)))
+			PveQueueCapNumber.Set((float64(PveQueueCapValue)))
 			MmrDataQueueCapNumber.Set(float64(MmrDataQueueCapValue))
 			DivisionDataQueueCapNumber.Set(float64(DivisionDataQueueCapValue))
 			MmrReadyQueueCapNumber.Set(float64(MmrReadyQueueCapValue))
@@ -234,7 +234,7 @@ func getBattles() {
 	connectionValue = dat.TotalConnection
 	pveValue = dat.TotalPve
 	pvpValue = dat.TotalPvp
-	PveHashmapCapValue = dat.PveHashmapCap
+	PveQueueCapValue = dat.PveQueueCap
 	MmrDataQueueCapValue = dat.MmrDataQueueCap
 	DivisionDataQueueCapValue = dat.DivisionDataQueueCap
 	MmrReadyQueueCapValue = dat.MmrReadyQueueCap
@@ -263,7 +263,7 @@ func main() {
 	prometheus.MustRegister(playerNumber)
 	prometheus.MustRegister(pveNumber)
 	prometheus.MustRegister(pvpNumber)
-	prometheus.MustRegister(PveHashmapCapNumber)
+	prometheus.MustRegister(PveQueueCapNumber)
 	prometheus.MustRegister(MmrDataQueueCapNumber)
 	prometheus.MustRegister(DivisionDataQueueCapNumber)
 	prometheus.MustRegister(MmrReadyQueueCapNumber)
