@@ -31,11 +31,45 @@ type Data struct {
 	PveQueue           int `json:"pve_queue"`
 	TotalPve           int `json:"total_pve"`
 	TotalPvp           int `json:"total_pvp"`
+
+	PveHashmapCap         int `json:"pve_hashmap_cap"`
+	MmrDataQueueCap       int `json:"mmr_data_queue_cap"`
+	DivisionDataQueueCap  int `json:"division_data_queue_cap"`
+	MmrReadyQueueCap      int `json:"mmr_ready_queue_cap"`
+	DivisionReadyQueueCap int `json:"division_ready_queue_cap"`
 }
 
-var battlesValue, clientmapValue, mmrdataqueueValue, divisiondataqueueValue, mmrreadyqueueValue, divisionreadyqueueValue, pvequeueValue, playerValue, connectionValue, pveValue, pvpValue int
+var battlesValue, clientmapValue, mmrdataqueueValue, divisiondataqueueValue, mmrreadyqueueValue, divisionreadyqueueValue, pvequeueValue, playerValue, connectionValue, pveValue, pvpValue, PveHashmapCapValue, MmrDataQueueCapValue, DivisionDataQueueCapValue, MmrReadyQueueCapValue, DivisionReadyQueueCapValue int
 
 var (
+	PveHashmapCapNumber = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_pve_hashmap_cap",
+		Help:        "The total number of pve hashmap",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+	MmrDataQueueCapNumber = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_mmr_data_queue_cap",
+		Help:        "The total number of pvp hashmap",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+
+	DivisionDataQueueCapNumber = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_division_data_queue_cap",
+		Help:        "The total number of pve hashmap",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+	MmrReadyQueueCapNumber = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_serve_mmr_ready_queue_cap",
+		Help:        "The total number of pvp hashmap",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+
+	DivisionReadyQueueCapNumber = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "origin_game_server_division_ready_queue_cap",
+		Help:        "The total number of pvp hashmap",
+		ConstLabels: map[string]string{"nodename": getHostName()},
+	})
+
 	battlesNumber = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:        "origin_game_server_battle_total",
 		Help:        "The total number of match happening",
@@ -141,7 +175,11 @@ func recordMetrics() {
 			connectionNumber.Set(float64(connectionValue))
 			pvpNumber.Set((float64(pvpValue)))
 			pveNumber.Set((float64(pveValue)))
-
+			PveHashmapCapNumber.Set((float64(PveHashmapCapValue)))
+			MmrDataQueueCapNumber.Set(float64(MmrDataQueueCapValue))
+			DivisionDataQueueCapNumber.Set(float64(DivisionDataQueueCapValue))
+			MmrReadyQueueCapNumber.Set(float64(MmrReadyQueueCapValue))
+			DivisionReadyQueueCapNumber.Set(float64(DivisionReadyQueueCapValue))
 			time.Sleep(15 * time.Second)
 		}
 	}()
@@ -184,7 +222,7 @@ func getBattles() {
 		panic(err)
 	}
 
-	// // set value
+	// set value
 	battlesValue = dat.TotalBattle
 	clientmapValue = dat.ClientMap
 	mmrdataqueueValue = dat.MmrDataQueue
@@ -196,6 +234,11 @@ func getBattles() {
 	connectionValue = dat.TotalConnection
 	pveValue = dat.TotalPve
 	pvpValue = dat.TotalPvp
+	PveHashmapCapValue = dat.PveHashmapCap
+	MmrDataQueueCapValue = dat.MmrDataQueueCap
+	DivisionDataQueueCapValue = dat.DivisionDataQueueCap
+	MmrReadyQueueCapValue = dat.MmrReadyQueueCap
+	DivisionReadyQueueCapValue = dat.DivisionReadyQueueCap
 }
 
 // Get node name
@@ -220,7 +263,11 @@ func main() {
 	prometheus.MustRegister(playerNumber)
 	prometheus.MustRegister(pveNumber)
 	prometheus.MustRegister(pvpNumber)
-
+	prometheus.MustRegister(PveHashmapCapNumber)
+	prometheus.MustRegister(MmrDataQueueCapNumber)
+	prometheus.MustRegister(DivisionDataQueueCapNumber)
+	prometheus.MustRegister(MmrReadyQueueCapNumber)
+	prometheus.MustRegister(DivisionReadyQueueCapNumber)
 	// record metrics
 	recordMetrics()
 
