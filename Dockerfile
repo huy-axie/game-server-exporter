@@ -1,4 +1,4 @@
-FROM golang:buster AS builder
+FROM golang:1.17.10-buster AS builder
 ENV GO111MODULE=on
 
 WORKDIR /src
