@@ -55,12 +55,12 @@ var (
 
 	DivisionDataQueueCapNumber = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:        "origin_game_server_division_data_queue_cap",
-		Help:        "The total number of pve hashmap",
+		Help:        "The total number of division data queue",
 		ConstLabels: map[string]string{"nodename": getHostName()},
 	})
 	MmrReadyQueueCapNumber = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:        "origin_game_serve_mmr_ready_queue_cap",
-		Help:        "The total number of pvp hashmap",
+		Help:        "The total number of mmr queue cap",
 		ConstLabels: map[string]string{"nodename": getHostName()},
 	})
 
