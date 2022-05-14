@@ -2,7 +2,10 @@ module game-server-exporter
 
 go 1.17
 
-require github.com/prometheus/client_golang v1.11.0
+require (
+	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/prometheus/client_golang v1.11.0
+)
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
